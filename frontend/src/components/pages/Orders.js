@@ -7,11 +7,42 @@ const Orders = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [startPrice, setStartPrice] = useState("");
   const [endPrice, setEndPrice] = useState("");
-
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(null);
 
   const handleInputChange = (e) => {
     setSearchTerm(e.target.value);
   };
+
+  // format date time
+  //2023-06-22 18:50:15.000000
+  const dateTimeForServer = (dateTime) => {
+    const date = new Date(dateTime);
+    const year = date.getFullYear()
+    const month = date.getMonth() + 1 
+    const day = date.getDate();
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const seconds = date.getSeconds();
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.000000`;
+  }
+
+
+  const handleDateRange = async () => {
+    console.log(dateTimeForServer(startDate))
+    try {
+      const startDateTime = dateTimeForServer(startDate);
+      const endDateTime = dateTimeForServer(endDate);
+
+      const { data } = await axios.get(`${process.env.REACT_APP_API}/api/v1/orders/search-order/by-date-range?startDate=${startDateTime}&endDate=${endDateTime}`);
+      console.log(data);
+      if (data.success) {
+        setOrders(data.result);
+      }
+    } catch (error) {
+      console.log("error while handling date range", error);
+    }
+  }
 
   const searchOrderByBookName = async (e) => {
     e.preventDefault();
@@ -37,7 +68,7 @@ const Orders = () => {
       console.log("error in fetching all orders", error);
     }
   }
- 
+
   useEffect(() => {
     getLatestOrderFirst()
     console.log(orders);
@@ -70,7 +101,7 @@ const Orders = () => {
       console.log("error in sort order from min Price to max Price", error);
     }
   }
-  
+
   // sort order from max Price to Min Price
   const maxToMinPrice = async () => {
     try {
@@ -117,25 +148,25 @@ const Orders = () => {
         <div className="left bg-slate-100 w-52">
           <div className="my-5">
             <p className="text-black text-2xl">Sort Order</p>
-            <button 
+            <button
               className="m-2 px-4 py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 transition duration-200"
               onClick={() => minToMaxPrice()}
             >
               minPrice to MaxPrice
             </button>
-            <button 
+            <button
               className="m-2 px-4 py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 transition duration-200"
               onClick={() => maxToMinPrice()}
             >
               MaxPrice to minPrice
             </button>
-            <button 
+            <button
               className="m-2 px-4 py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 transition duration-200"
               onClick={() => getLatestOrderFirst()}
             >
               Latest Order First
             </button>
-            <button 
+            <button
               className="m-2 px-4 py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 transition duration-200"
               onClick={() => getOldestOrderFirst()}
             >
@@ -144,13 +175,14 @@ const Orders = () => {
           </div>
           <div className="mt-5">
             <h1 className="text-black text-2xl">Search Order</h1>
-            <h1>price range</h1>
+            {/* price range */}
+            <h1> By price range</h1>
             <div className="form container ml-1 my-2">
-              <form  
+              <form
                 onSubmit={(e) => searchOrderByPriceRange(e)}
               >
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   placeholder="₹ Min"
                   className="w-16 rounded-sm px-2 py-1 border-2 border-blue-500"
                   onChange={(e) => setStartPrice(e.target.value)}
@@ -168,6 +200,31 @@ const Orders = () => {
                   Go
                 </button>
               </form>
+            </div>
+
+            {/* search by date range */}
+            <h1 className="mt-4 mb-2"> By Date range</h1>
+            <div className="flex flex-col justify-center">
+              <input
+                type="datetime-local"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="p-2 border border-blue-500 rounded-md mr-2"
+                placeholderText="Start Date"
+              />
+              <input
+                type="datetime-local"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="p-2 border border-blue-500 rounded-md mr-2 mt-1 mb-2"
+                placeholderText="End Date"
+              />
+              <button
+                onClick={() => handleDateRange()}
+                className="p-2 border bg-blue-100 border-blue-500 rounded-md mr-2 hover:bg-blue-200"
+              >
+                Go
+              </button>
             </div>
 
           </div>
