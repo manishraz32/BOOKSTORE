@@ -13,7 +13,7 @@ const Header = () => {
     }
 
     return (
-        <nav className="bg-blue-500 h-[50px] flex justify-end items-center sticky top-0">
+        <nav className="bg-blue-500 h-[50px] w-[100%] flex justify-end items-center sticky top-0">
             <ul className="flex justify-center space-x-4">
                 <li>
                     <Link

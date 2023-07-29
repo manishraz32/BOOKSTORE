@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useAuth } from '../../context/auth';
 import Layout from '../Layout/Layout'
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 
 const HomePage = () => {
@@ -14,7 +14,7 @@ const HomePage = () => {
 
   const handleInputChange = (e) => {
     setSearchTerm(e.target.value);
-    if(e.target.value.trim() === "") {
+    if (e.target.value.trim() === "") {
       getBooks()
     }
   };
@@ -64,8 +64,8 @@ const HomePage = () => {
       const order = { customer_ID: auth.user._id, book_ID: id, order_date: new Date() };
       const res = await axios.post(
         `${process.env.REACT_APP_API}/api/v1/orders/add-order`,
-          order
-        );
+        order
+      );
       if (res && res?.data?.success) {
         navigate('/orders')
       } else {
@@ -109,12 +109,12 @@ const HomePage = () => {
                 <p className="text-gray-600">{book.author}</p>
                 <p className="text-gray-800 ">{book.description}</p>
                 <p className="text-lg font-semibold ">{book.price}</p>
-                <button
-                  className="bg-blue-500 w-[250px] hover:bg-blue-600 text-white py-2 px-4 rounded-md"
-                  onClick={() => handleClick(book.id)}
+                <Link
+                  className="bg-blue-500 w-[250px] h-[40px] hover:bg-blue-600 text-white rounded-md flex justify-center items-center"
+                  to={`/product-detail/${book.id}`}
                 >
-                  Order
-                </button>
+                  View Detail
+                </Link>
               </div>
             </div>
           ))
